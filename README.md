@@ -1,6 +1,6 @@
 # MSBuild Test Project
 
-This project demonstrates how to use MSBuild properties to detect .NET framework versions in a multi-targeting project. It provides a minimal test case for understanding how framework version detection works in MSBuild.
+This project demonstrates the behavior of MSBuild properties for detecting .NET framework versions in a multi-targeting project. It provides a minimal test case for understanding how framework version detection works in MSBuild and highlights some important limitations.
 
 ## Project Structure
 
@@ -31,42 +31,48 @@ The project demonstrates two approaches to framework version detection:
 
 ## Test Results
 
-The build log shows that both approaches work correctly:
+The build log reveals several important findings:
 
-1. Properties in `Directory.Build.props` are evaluated during the initial property evaluation phase:
-```
-Property reassignment: $(IsNet8OrGreater)="true" (previous value: "false")
-Property reassignment: $(IsNet9OrGreater)="true" (previous value: "false")
-```
+1. Properties in `Directory.Build.props`:
+   - Work correctly during framework-specific builds:
+     ```
+     [TestLibrary] [BeforeBuild] TargetFramework: net9.0, TargetFrameworkVersion: 9.0, IsNet8OrGreater: true, IsNet9OrGreater: true
+     [TestLibrary] [BeforeBuild] TargetFramework: net8.0, TargetFrameworkVersion: 8.0, IsNet8OrGreater: true, IsNet9OrGreater: false
+     ```
+   - Become empty/false in some build steps:
+     ```
+     [TestLibrary] [BeforeBuild] TargetFramework: , TargetFrameworkVersion: 0.0, IsNet8OrGreater: false, IsNet9OrGreater: false
+     ```
 
-2. Properties in `Directory.Build.targets` are evaluated during the target execution phase:
-```
-Property reassignment: $(IsNet8OrGreaterTarget)="true" (previous value: "false")
-Property reassignment: $(IsNet9OrGreaterTarget)="true" (previous value: "false")
-```
+2. Properties in `Directory.Build.targets`:
+   - Are consistently empty throughout the build:
+     ```
+     [TestLibrary] [BeforeBuild] TargetFramework: net9.0, TargetFrameworkVersionTarget: , IsNet8OrGreaterTarget: , IsNet9OrGreaterTarget: 
+     [TestLibrary] [BeforeBuild] TargetFramework: net8.0, TargetFrameworkVersionTarget: , IsNet8OrGreaterTarget: , IsNet9OrGreaterTarget: 
+     ```
 
 ## Key Findings
 
-1. Both approaches successfully detect the framework version
-2. The properties are available at different phases of the build:
-   - `Directory.Build.props` properties are available during property evaluation
-   - `Directory.Build.targets` properties are available during target execution
-3. The `TargetFrameworkVersion` property is correctly set to "v8.0" or "v9.0" depending on the target framework
-4. No runtime constants are needed - the build properties are sufficient for build-time conditions
+1. The `Directory.Build.props` approach works partially:
+   - Properties are correctly set during framework-specific builds
+   - Properties become empty/false in certain build steps
+   - This suggests the properties are not consistently available throughout the build
 
-## Usage
+2. The `Directory.Build.targets` approach does not work:
+   - Properties remain empty throughout the build
+   - This suggests the target execution phase is not the right place for these properties
 
-To use these properties in your code, you can reference them in MSBuild conditions:
+3. Both approaches show issues:
+   - Properties are not consistently available
+   - There are build steps where all properties are empty
+   - This indicates a more fundamental issue with property availability in MSBuild
 
-```xml
-<PropertyGroup Condition="'$(IsNet8OrGreater)' == 'true'">
-  <!-- .NET 8.0 or greater specific settings -->
-</PropertyGroup>
+## Implications
 
-<PropertyGroup Condition="'$(IsNet9OrGreater)' == 'true'">
-  <!-- .NET 9.0 or greater specific settings -->
-</PropertyGroup>
-```
+1. Framework version detection in MSBuild is more complex than initially assumed
+2. Properties may not be available when needed, even in the property evaluation phase
+3. Moving properties to targets does not solve the availability issues
+4. Care must be taken when using these properties in build conditions
 
 ## Building
 
