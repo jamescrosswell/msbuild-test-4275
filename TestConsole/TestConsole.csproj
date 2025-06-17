@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net9.0;net8.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TestLibrary\TestLibrary.csproj" />
+  </ItemGroup>
+
+  <!-- Test using the properties in a PropertyGroup -->
+  <PropertyGroup Condition="'$(IsNet8OrGreater)' == 'true'">
+    <DefineConstants>$(DefineConstants);NET8_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsNet9OrGreater)' == 'true'">
+    <DefineConstants>$(DefineConstants);NET9_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+
+</Project>

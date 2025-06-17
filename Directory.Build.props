@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <!-- Helpful properties used elsewhere -->
+  <PropertyGroup>
+    <TargetFrameworkVersion>$([MSBuild]::GetTargetFrameworkVersion($(TargetFramework)))</TargetFrameworkVersion>
+    <IsNet8OrGreater>false</IsNet8OrGreater>
+    <IsNet8OrGreater Condition="$([MSBuild]::VersionGreaterThanOrEquals($(TargetFrameworkVersion), 8.0))">true</IsNet8OrGreater>
+    <IsNet9OrGreater>false</IsNet9OrGreater>
+    <IsNet9OrGreater Condition="$([MSBuild]::VersionGreaterThanOrEquals($(TargetFrameworkVersion), 9.0))">true</IsNet9OrGreater>
+    
+    <!-- Debug logging -->
+    <DebugMessage>TargetFramework: $(TargetFramework), TargetFrameworkVersion: $(TargetFrameworkVersion), IsNet8OrGreater: $(IsNet8OrGreater), IsNet9OrGreater: $(IsNet9OrGreater)</DebugMessage>
+  </PropertyGroup>
+
+  <!-- Log the values at different MSBuild lifecycle points -->
+  <Target Name="LogFrameworkPropertiesInitial" BeforeTargets="PrepareForBuild">
+    <Message Text="[$(MSBuildProjectName)] [PrepareForBuild] $(DebugMessage)" Importance="high" />
+  </Target>
+
+  <Target Name="LogFrameworkPropertiesBeforeBuild" BeforeTargets="Build">
+    <Message Text="[$(MSBuildProjectName)] [BeforeBuild] $(DebugMessage)" Importance="high" />
+  </Target>
+
+  <Target Name="LogFrameworkPropertiesAfterBuild" AfterTargets="Build">
+    <Message Text="[$(MSBuildProjectName)] [AfterBuild] $(DebugMessage)" Importance="high" />
+  </Target>
+
+  <Target Name="LogFrameworkPropertiesBeforeCompile" BeforeTargets="Compile">
+    <Message Text="[$(MSBuildProjectName)] [BeforeCompile] $(DebugMessage)" Importance="high" />
+  </Target>
+
+  <Target Name="LogFrameworkPropertiesAfterCompile" AfterTargets="Compile">
+    <Message Text="[$(MSBuildProjectName)] [AfterCompile] $(DebugMessage)" Importance="high" />
+  </Target>
+
+  <Target Name="LogFrameworkPropertiesBeforeRestore" BeforeTargets="Restore">
+    <Message Text="[$(MSBuildProjectName)] [BeforeRestore] $(DebugMessage)" Importance="high" />
+  </Target>
+
+  <Target Name="LogFrameworkPropertiesAfterRestore" AfterTargets="Restore">
+    <Message Text="[$(MSBuildProjectName)] [AfterRestore] $(DebugMessage)" Importance="high" />
+  </Target>
+</Project> 

@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!-- Test using the properties in a PropertyGroup -->
+  <PropertyGroup Condition="'$(IsNet8OrGreater)' == 'true'">
+    <DefineConstants>$(DefineConstants);NET8_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsNet9OrGreater)' == 'true'">
+    <DefineConstants>$(DefineConstants);NET9_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+
+</Project>
