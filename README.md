@@ -1,6 +1,6 @@
 # MSBuild Test Project
 
-This project demonstrates the behavior of MSBuild properties for detecting .NET framework versions in a multi-targeting project. It provides a minimal test case for understanding how framework version detection works in MSBuild and highlights some important limitations.
+This project investigates the behavior of MSBuild properties for detecting .NET framework versions in a multi-targeting project. It provides a minimal test case for understanding how framework version detection works in MSBuild and highlights some important limitations.
 
 ## Project Structure
 
@@ -44,6 +44,11 @@ The build log reveals several important findings:
      [TestLibrary] [BeforeBuild] TargetFramework: , TargetFrameworkVersion: 0.0, IsNet8OrGreater: false, IsNet9OrGreater: false
      ```
 
+     References:
+        - https://github.com/jamescrosswell/msbuild-test-4275/blob/4056d039ea5a74e01f95c84bda01bdbcef234676/build.log#L13008
+        -  https://github.com/jamescrosswell/msbuild-test-4275/blob/4056d039ea5a74e01f95c84bda01bdbcef234676/build.log#L13110
+        - https://github.com/jamescrosswell/msbuild-test-4275/blob/4056d039ea5a74e01f95c84bda01bdbcef234676/build.log#L13149
+
 2. Properties in `Directory.Build.targets`:
    - Are consistently empty throughout the build:
      ```
@@ -56,27 +61,15 @@ The build log reveals several important findings:
 1. The `Directory.Build.props` approach works partially:
    - Properties are correctly set during framework-specific builds
    - Properties become empty/false in certain build steps
-   - This suggests the properties are not consistently available throughout the build
+   - Perhaps we avoid setting these properties if/when the `$(TargetFramework)` is empty
 
 2. The `Directory.Build.targets` approach does not work:
    - Properties remain empty throughout the build
    - This suggests the target execution phase is not the right place for these properties
 
-3. Both approaches show issues:
-   - Properties are not consistently available
-   - There are build steps where all properties are empty
-   - This indicates a more fundamental issue with property availability in MSBuild
-
-## Implications
-
-1. Framework version detection in MSBuild is more complex than initially assumed
-2. Properties may not be available when needed, even in the property evaluation phase
-3. Moving properties to targets does not solve the availability issues
-4. Care must be taken when using these properties in build conditions
-
 ## Building
 
-To build the project with detailed logging:
+To reproduce, you can build solution with detailed logging:
 
 ```bash
 dotnet build -v detailed > build.log 2>&1
